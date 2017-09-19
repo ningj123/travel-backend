@@ -1,0 +1,51 @@
+.bgimgwrapper {
+    top: 0;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    z-index: -1;
+}
+
+header {
+    margin-top: 20px;
+}
+
+.returnicon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.avatar {
+    width: 130px;
+}
+
+.username {
+    color: #ffffff;
+}
+
+.record {
+    background: #ffffff;
+    height: 450px;
+    border: 1px solid #8f8f8f;
+    border-radius:15px;
+    margin: 20px 5%;
+}
+
+.record h5 {
+    font-weight: 100;
+}
+
+.statusnav {
+    margin-top: 10px;
+}
+
+.statusnav p {
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.activenav {
+    border-bottom: 2px solid;
+    border-bottom-color: orange;
+}

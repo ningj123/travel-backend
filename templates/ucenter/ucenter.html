@@ -8,6 +8,7 @@
 
 {% block exthead %}
     <link href="{% static 'ucenter/ucenter.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'ucenter/iconfont.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block body %}
@@ -16,7 +17,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12">
-                    <i class="glyphicon glyphicon-chevron-left returnicon"></i>
+                    <i class="glyphicon glyphicon-chevron-left returnicon" onclick="location.href='{% url 'index' %}'"></i>
                 </div>
             </div>
             <div class="row userinfo text-center">
@@ -33,12 +34,40 @@
             </div>
             <div class="row text-center statusnav">
                 <div class="col-xs-6">
-                    <p class="activenav">进行中</p>
+                    <p class="activenav" id="now">进行中</p>
                 </div>
                 <div class="col-xs-6">
-                    <p>已完成</p>
+                    <p id="done">已完成</p>
                 </div>
             </div>
         </div>
     </section>
+
+    <section class="listfooter">
+        <div class="container-fluid">
+            <div class="listfooterli">
+                <p><i class="icon iconfont icon-shijian" style="color: deepskyblue"></i>&nbsp;&nbsp;我的预约<i class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
+            </div>
+            <div class="listfooterli">
+                <p><i class="icon iconfont icon-dianhua" style="color: orange"></i>&nbsp;&nbsp;联系我们<i class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
+            </div>
+            <div class="listfooterli">
+                <p><i class="icon iconfont icon-shu" style="color: orangered"></i>&nbsp;&nbsp;使用协议<i class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+        let nownavtag = $('#now');
+        let donenavtag = $('#done');
+        nownavtag.click(function () {
+            nownavtag.addClass('activenav');
+            donenavtag.removeClass('activenav');
+        });
+        donenavtag.click(function () {
+            donenavtag.addClass('activenav');
+            nownavtag.removeClass('activenav');
+        });
+    </script>
 {% endblock %}

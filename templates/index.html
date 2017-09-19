@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exthead %}
+    <link href="{% static 'index/index.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'index/iconfont.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <div class="bgimgwrapper" style="background-image: url({% static 'index/bg12.jpg' %})"></div>
+
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <span class="h4" style="line-height: 33px; padding-left: 20px">智慧出行</span>
+                    <i class="icon iconfont icon-ren ucenter" style="cursor: pointer"
+                       onclick="location.href='{% url 'ucenter' %}'"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="service">
+        <div class="container">
+            <div class="row text-center servicetitle">
+                <p class="h3" style="color: deepskyblue; font-weight: 100; line-height: 30px;">所有服务</p>
+            </div>
+            <div class="serviceli row">
+                <div class="col-xs-3">
+                    <i class="iicon iconfont icon-che2"></i>
+                </div>
+                <div class="col-xs-9 text-center" style="line-height: 35px">
+                    <span class="h4" style="font-weight: 300">校车预约</span>
+                </div>
+            </div>
+            <hr>
+
+            <div class="serviceli row">
+                <div class="col-xs-3">
+                    <i class="icon iconfont icon-che"></i>
+                </div>
+                <div class="col-xs-9 text-center" style="line-height: 35px">
+                    <span class="h4" style="font-weight: 300">专车预约</span>
+                </div>
+            </div>
+            <hr>
+
+            <div class="serviceli row">
+                <div class="col-xs-3">
+                    <i class="icon iconfont icon-che1"></i>
+                </div>
+                <div class="col-xs-9 text-center" style="line-height: 35px">
+                    <span class="h4" style="font-weight: 300">包车</span>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </section>
+
+    <section class="know text-center">
+        <h4>使用提示</h4>
+        <p class="h5 text-left">1. 使用说明1使用说明1使用说明1使用说明1使用说明1</p>
+        <p class="h5 text-left">2. 使用说明1使用说明1使用说明1使用说明1使用说明1</p>
+        <p class="h5 text-left">2. 使用说明1使用说明1使用说明1使用说明1使用说明1</p>
+    </section>
+
+    <footer class="text-center">
+        <p>© 2017 众焰科技, Inc.</p>
+    </footer>
+{% endblock %}

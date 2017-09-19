@@ -1,3 +1,7 @@
+body {
+    background-color: #fafafa;
+}
+
 .bgimgwrapper {
     top: 0;
     position: absolute;
@@ -43,9 +47,36 @@ header {
 .statusnav p {
     font-size: 15px;
     cursor: pointer;
+    padding-bottom: 5px;
+    margin: 0 20px;
 }
 
 .activenav {
     border-bottom: 2px solid;
     border-bottom-color: orange;
+}
+
+.listfooter {
+    margin-top: 10px;
+}
+
+.listfooterli {
+    border-top: 1px solid #bdbdbd;
+    height: 50px;
+}
+
+.listfooterli:hover {
+    cursor: pointer;
+    border-top: 1px solid #bdbdbd;
+    height: 50px;
+    background-color: #e3e3e3;
+}
+
+.listfooterli p {
+    margin-top: 15px;
+}
+
+.goto {
+    cursor: pointer;
+
 }

@@ -1,0 +1,57 @@
+body {
+    background-color: #fafafa;
+}
+
+.bgimgwrapper {
+    top: 0;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    z-index: -1;
+}
+
+header {
+    margin-top: 20px;
+}
+
+.ucenter {
+    float: right;
+    line-height: 33px;
+    font-size: 20px !important;
+}
+
+.service {
+    margin: 80px 5% 20px 5%;
+    height: 350px;
+    border-radius:15px;
+    border: 1px solid #8f8f8f;
+    background: #ffffff;
+}
+
+.serviceli {
+    margin: 25px 20px;
+    cursor: pointer;
+}
+
+.serviceli i {
+    color: orange;
+    line-height: 33px;
+    font-size: 40px;
+}
+
+.clearfix {
+    border-bottom: 1px solid #d2d2d2;
+}
+
+.servicetitle {
+    border-bottom: 2px solid #adadad;
+    padding: 5px 0  15px 0;
+}
+
+.know p {
+    margin: 20px 5% 20px 7%;
+}
+
+footer {
+    margin-top: 50px;
+}

@@ -1,0 +1,41 @@
+from django.db import models
+from django.utils import timezone
+
+
+class SchoolBusTimeSchedules(models.Model):
+    date_schedule = models.CharField(max_length=10, verbose_name="时刻")
+
+    def __str__(self):
+        return self.date_schedule
+
+    class Meta:
+        verbose_name = "发车时间"
+        verbose_name_plural = verbose_name
+
+
+class SchoolBusWeekSchedules(models.Model):
+    week = models.IntegerField(
+        choices=((1, "星期一"), (2, "星期二"), (3, "星期三"), (4, "星期四"), (5, "星期五"), (6, "星期六"), (7, "星期天")), verbose_name="星期")
+    time = models.ManyToManyField(SchoolBusTimeSchedules, verbose_name="发车时间")
+
+    def __str__(self):
+        return self.get_week_display()
+
+    class Meta:
+        verbose_name = "一周发车时刻"
+        verbose_name_plural = verbose_name
+
+
+class SchoolBus(models.Model):
+    schedule = models.ForeignKey(SchoolBusTimeSchedules, verbose_name="时刻")
+    num_reserve = models.IntegerField(default=0, verbose_name="预约人数")
+    num_seats = models.IntegerField(blank=True, null=True, verbose_name="总座位数")
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.schedule.date_schedule
+
+    class Meta:
+        verbose_name = "校车班次"
+        verbose_name_plural = verbose_name
+        ordering = ['-date']

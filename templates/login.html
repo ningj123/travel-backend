@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    登录
+{% endblock %}
+
+{% block exthead %}
+    <link href="{% static 'login/login.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <section class="logo text-center">
+        <img src="{% static 'login/logo131.jpg' %}" class="img-circle">
+    </section>
+
+    <section class="loginform container">
+        {% if request.user.is_authenticated %}
+            <div class="alert alert-dismissible alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <p>您当前正以&nbsp;<strong>{{ request.user.username }}&nbsp;登录</strong></p>
+            </div>
+        {% endif %}
+        <div class="alert alert-dismissible alert-danger hidden" id="alertTag">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <p id="alertInfo"></p>
+        </div>
+        <form id="loginform">
+            {% csrf_token %}
+            <div class="form-group" id="usernameForm">
+                <label for="inputUsername">手机号码</label>
+                <input type="text" class="form-control" id="inputUsername" name="username" onfocus="resetForm()"
+                       minlength="11" maxlength="11">
+            </div>
+            <div class="form-group" id="passwordForm">
+                <label for="inputPassword">密码</label>
+                <input type="password" class="form-control" id="inputPassword" name="password" onfocus="resetForm()">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success btn-block" onclick="onSubmit()" type="button">登录</button>
+                <br>
+                <a class="text-danger pull-right">忘记密码？</a>
+                <a class="text-info pull-left" href="{% url 'signup' %}">没有账号？立即注册</a>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        $(document).ready(() => {
+            $('#inputUsername')[0].value = localStorage.getItem('username');
+
+        });
+
+        function resetForm() {
+            $('#alertTag').addClass('hidden');
+            $('#alertInfo')[0].innerHTML = '';
+            $('#passwordForm').removeClass('has-error');
+            $('#usernameForm').removeClass('has-error');
+        }
+
+        function onSubmit() {
+
+
+            function checkForm() {
+                const inputTag = $('#inputUsername');
+                if (inputTag[0].value.match(/^[0-9]{11}$/) === null) {
+                    $('#usernameForm').addClass('has-error');
+                    $('#alertTag').removeClass('hidden');
+                    $('#alertInfo')[0].innerHTML = '无效的手机号码';
+                    inputTag[0].value = '';
+                    $('#inputPassword')[0].value = '';
+                    return false;
+                }
+                return true;
+            }
+
+            if (!checkForm()) {
+                return false;
+            }
+            $.post('{% url 'login' %}', $('#loginform').serialize(),
+                function (data) {
+                    if (data['status']) {
+                        location.href = '{% url 'index' %}';
+                    } else {
+                        $('#usernameForm').addClass('has-error');
+                        $('#passwordForm').addClass('has-error');
+                        $('#alertTag').removeClass('hidden');
+                        $('#alertInfo')[0].innerHTML = '手机号码或密码错误';
+                        inputTag[0].value = '';
+                        $('#inputPassword')[0].value = ''
+                    }
+                }, 'json');
+        }
+    </script>
+{% endblock %}

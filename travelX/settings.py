@@ -10,7 +10,7 @@ SECRET_KEY = ')u08=^3u5iw*%2b$v1tgfi(-)l=hvl7$$o7uwy7m_h#cjcc@#k'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'reserve',
 
     'rest_framework',
 ]

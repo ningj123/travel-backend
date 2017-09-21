@@ -1,0 +1,16 @@
+body {
+    background: #fafafa;
+}
+
+.logo {
+    margin-top: 50px;
+}
+
+.logo img {
+    width: 140px;
+}
+
+.signupform {
+    max-width: 330px;
+    margin: 50px auto;
+}

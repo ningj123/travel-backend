@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    注册
+{% endblock %}
+
+{% block exthead %}
+    <link href="{% static 'signup/signup.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <section class="logo text-center">
+        <img src="{% static 'signup/logo131.jpg' %}" class="img-circle">
+    </section>
+
+    <section class="container signupform">
+        {% if request.user.is_authenticated %}
+            <div class="alert alert-dismissible alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <p>您当前正以&nbsp;<strong>{{ request.user.username }}&nbsp;登录</strong></p>
+            </div>
+        {% endif %}
+        <div class="alert alert-dismissible alert-danger hidden" id="alertTag">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <p id="alertInfo"></p>
+        </div>
+
+        <form id="signupform">
+            {% csrf_token %}
+            <div class="form-group" id="usernameForm">
+                <label for="inputUsername">手机号码</label>
+                <input type="text" class="form-control" id="inputUsername" name="username" onfocus="resetForm()"
+                       minlength="11" maxlength="11">
+            </div>
+            <div class="form-group" id="passwordForm">
+                <label for="inputPassword">密码</label>
+                <input type="password" class="form-control" id="inputPassword" name="password" onfocus="resetForm()">
+            </div>
+            <div class="form-group" id="password2Form">
+                <label for="inputPassword2">确认密码</label>
+                <input type="password" class="form-control" id="inputPassword2" onfocus="resetForm()">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success btn-block" onclick="onSubmit()" type="button">注册</button>
+                <br>
+                <a class="text-info pull-left" href="{% url 'login' %}">已有账号？立即登录</a>
+            </div>
+        </form>
+    </section>
+    <script>
+        function resetForm() {
+            $('#alertTag').addClass('hidden');
+            $('#alertInfo')[0].innerHTML = '';
+            $('#usernameForm').removeClass('has-error');
+            $('#passwordForm').removeClass('has-error');
+            $('#password2Form').removeClass('has-error');
+        }
+
+        function onSubmit() {
+            function checkForm() {
+                const utag = $('#inputUsername');
+                const ptag = $('#inputPassword');
+                const p2tag = $('#inputPassword2');
+                if (utag[0].value.match(/^[0-9]{11}$/) === null) {
+                    $('#usernameForm').addClass('has-error');
+                    $('#alertTag').removeClass('hidden');
+                    $('#alertInfo')[0].innerHTML = '无效的手机号码';
+                    utag[0].value = '';
+                    ptag[0].value = '';
+                    p2tag[0].value = '';
+                    return false;
+                }
+                if (ptag[0].value !== p2tag[0].value) {
+                    $('#passwordForm').addClass('has-error');
+                    $('#password2Form').addClass('has-error');
+                    $('#alertTag').removeClass('hidden');
+                    $('#alertInfo')[0].innerHTML = '两次输入的密码不一致';
+                    ptag[0].value = '';
+                    p2tag[0].value = '';
+                    return false;
+                }
+                return true;
+            }
+
+            if (!checkForm()) {
+                return false;
+            }
+            $.post('{% url 'signup' %}', $('#signupform').serialize(),
+                function (data) {
+                    if (data['status']) {
+                        localStorage.setItem('username', $('#inputUsername')[0].value);
+                        location.href = '{% url 'login' %}'
+                    } else {
+                        $('#usernameForm').addClass('has-error');
+                        $('#passwordForm').addClass('has-error');
+                        $('#password2Form').addClass('has-error');
+                        $('#alertTag').removeClass('hidden');
+                        $('#alertInfo')[0].innerHTML = '注册失败';
+                        $('#inputUsername')[0].value = '';
+                        $('#inputPassword')[0].value = '';
+                        $('#inputPassword2')[0].value = '';
+                    }
+                }, "json");
+        }
+    </script>
+{% endblock %}

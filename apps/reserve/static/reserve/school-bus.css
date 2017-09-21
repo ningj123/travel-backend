@@ -1,0 +1,71 @@
+body {
+    background-color: #fafafa;
+}
+
+header {
+    margin-top: 15px;
+}
+
+.returnicon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 39px;
+}
+
+.reserve {
+    background: #ffffff;
+    height: 450px;
+    border: 1px solid #8f8f8f;
+    border-radius: 15px;
+    margin: 100px 5% 5% 20px;
+}
+
+.bgimgwrapper {
+    top: 0;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    z-index: -1;
+}
+
+.reserve-header {
+    margin: 15px 5px;
+}
+
+.order {
+    margin: 40px 5px 20px 5px;
+    font-size: 18px;
+    padding-bottom: 5px;
+}
+
+
+.orderinfo {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-top: 50px;
+}
+
+.makeorder {
+    margin-top: 60px;
+}
+
+.btn-order {
+    background: linear-gradient(to right, #fde813, #ffb41b);
+    color: #ffffff;
+    border-radius:25px;
+    padding: 10px 50px;
+}
+
+.order-choice {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+}
+
+#choiceLabel {
+    position: absolute;
+    font-weight: 500;
+}
+

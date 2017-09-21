@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    校车预约
+{% endblock %}
+
+{% block exthead %}
+    <link href="{% static 'reserve/school-bus.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <div class="bgimgwrapper" style="background-image: url({% static 'reserve/bg3.jpg' %})"></div>
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <i class="glyphicon glyphicon-chevron-left returnicon pull-left"
+                       onclick="location.href='{% url 'index' %}'"></i>
+                    <p class="h4" style="color: white; font-weight: 600">校车预约</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="reserve">
+        <div class="container-fluid">
+            <div class="row reserve-header">
+                <p class="h4" style="line-height: 30px">路线：武汉学院大学城校区—地铁4号线首义路地铁站C出口</p>
+            </div>
+            <div class="row order ">
+                {#                <div data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+                {#                    <i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;选择班次#}
+                {#                    <i class="glyphicon glyphicon-chevron-down pull-right dropdown-toggle"#}
+                {#                       style="color: #000000; cursor: pointer"#}
+                {#                    ></i>#}
+                {#                    <span class="pull-right" id="hour"></span>#}
+                {#                </div>#}
+                {#                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2" style="min-width: 100%">#}
+                {#                    <li><a>8:30</a></li>#}
+                {#                    <li><a>10:30</a></li>#}
+                {#                    <li><a>12:30</a></li>#}
+                {#                    <li><a>14:30</a></li>#}
+                {#                    <li><a>16:30</a></li>#}
+                {#                    <li><a>17:30</a></li>#}
+                {#                </ul>#}
+                <label for="choiceTime" id="choiceLabel"><i class="glyphicon glyphicon-time"
+                                                            style="color: deepskyblue"></i>&nbsp;&nbsp;选择班次</label>
+                <select class="form-control order-choice" id="choiceTime" onchange="choice()">
+                    <option hidden></option>
+                    {% for time in times %}
+                        <option value="{{ time.pk }}">{{ time.date_schedule }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row orderinfo">
+                <p class="h4 hidden" id="remains">您所选班次剩余座位&nbsp;&nbsp;&nbsp;<strong><span id="remain"></span>个</strong></p>
+            </div>
+            <div class="row makeorder text-center">
+                <button class="btn btn-lg btn-order" onclick="onSubmit()">座位预约</button>
+            </div>
+        </div>
+    </section>
+
+    {#    <div class="modal fade" tabindex="-1" role="dialog" id="routeModal">#}
+    {#        <div class="modal-dialog" role="document">#}
+    {#            <div class="modal-content">#}
+    {#                <div class="modal-header">#}
+    {#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span#}
+    {#                            aria-hidden="true">&times;</span></button>#}
+    {#                    <h4 class="modal-title">校车时间表</h4>#}
+    {#                </div>#}
+    {#                <div class="modal-body">#}
+    {#                    <p>One fine body&hellip;</p>#}
+    {#                </div>#}
+    {#                <div class="modal-footer">#}
+    {#                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
+    <script>
+        function choice() {
+            $('#choiceLabel')[0].innerHTML = '';
+            $.post('{% url 'seatsinfo' %}', {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: $('#choiceTime').val(),
+            }, function (data) {
+                $('#remains').removeClass('hidden');
+                $('#remain').text(data['remain'])
+            }, "json")
+        }
+        
+        function onSubmit() {
+            const choiceTag = $('#choiceTime');
+            if (choiceTag.val() === '') {
+                alert("请先选择班次");
+                return false;
+            }
+            $.post('{% url 'schoolbusreserve' %}', {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: choiceTag.val()
+            }, function (data) {
+
+            }, "json")
+        }
+    </script>
+{% endblock %}

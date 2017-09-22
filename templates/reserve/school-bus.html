@@ -55,13 +55,24 @@
                 </select>
             </div>
             <div class="row orderinfo">
-                <p class="h4 hidden" id="remains">您所选班次剩余座位&nbsp;&nbsp;&nbsp;<strong><span id="remain"></span>个</strong></p>
+                <p class="h4 hidden" id="remains">您所选班次剩余座位&nbsp;&nbsp;&nbsp;<strong><span id="remain"></span>个</strong>
+                </p>
             </div>
             <div class="row makeorder text-center">
                 <button class="btn btn-lg btn-order" onclick="onSubmit()">座位预约</button>
             </div>
         </div>
     </section>
+
+    {% if nowpk %}
+        <section onclick="location.href='{% url 'schoolbusreservesuccess' nowpk %}'" style="cursor: pointer;">
+            <div class="alert alert-info alert-dismissible text-center" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                您有正在进行中的预约
+            </div>
+        </section>
+    {% endif %}
 
     {#    <div class="modal fade" tabindex="-1" role="dialog" id="routeModal">#}
     {#        <div class="modal-dialog" role="document">#}
@@ -92,7 +103,7 @@
                 $('#remain').text(data['remain'])
             }, "json")
         }
-        
+
         function onSubmit() {
             const choiceTag = $('#choiceTime');
             if (choiceTag.val() === '') {
@@ -103,7 +114,12 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 pk: choiceTag.val()
             }, function (data) {
-
+                if (data['status']) {
+                    location.href = '{% url 'schoolbusreserve' %}' + data['pk'];
+                } else {
+                    alert("您有未完成的预约");
+                    return false;
+                }
             }, "json")
         }
     </script>

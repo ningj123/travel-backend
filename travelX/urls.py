@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^ucenter/$', users_views.UcenterView.as_view(), name='ucenter'),
     url(r'^media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
     url(r'^reserve/schoolbus/$', reserve_views.SchoolBusReserve.as_view(), name='schoolbusreserve'),
+    url(r'^reserve/schoolbus/(?P<pk>[0-9]+)/$',reserve_views.SchoolBusReserveSuccess.as_view(), name='schoolbusreservesuccess'),
     url(r'^reserve/seats/$', reserve_views.GetSeatsInfo.as_view(), name='seatsinfo')
 ]

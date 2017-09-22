@@ -1,0 +1,38 @@
+header {
+    margin-top: 15px;
+}
+
+.returnicon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 39px;
+}
+
+.successstr {
+    color: #ff9904;
+    font-weight: 600;
+}
+
+.reserveinfo {
+    margin: 100px 5%;
+}
+
+
+.reserve-time,
+.reserve-date {
+    margin-top: 20px;
+}
+
+.tips {
+    margin-top: 40px;
+}
+
+.reserve-op {
+    margin-top: 80px;
+}
+
+.reserve-op button {
+    padding: 7px 40px;
+    border-radius: 30px;
+}

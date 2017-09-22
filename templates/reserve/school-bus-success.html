@@ -93,7 +93,7 @@
                 dataTypeSting: 'json',
                 success: (data) => {
                     if (data['status']) {
-                        location.href = '{% url 'index' %}';
+                        location.href = '{% url 'schoolbusreservedone' %}'
                     }
                 },
                 error: (err) => console.error(err)

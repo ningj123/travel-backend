@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.views.static import serve
+from django.views.generic import TemplateView
 
 from users import views as users_views
 from reserve import views as reserve_views
@@ -16,5 +17,6 @@ urlpatterns = [
     url(r'^media/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
     url(r'^reserve/schoolbus/$', reserve_views.SchoolBusReserve.as_view(), name='schoolbusreserve'),
     url(r'^reserve/schoolbus/(?P<pk>[0-9]+)/$',reserve_views.SchoolBusReserveSuccess.as_view(), name='schoolbusreservesuccess'),
+    url(r'^reserve/schoolbus/done/$', TemplateView.as_view(template_name='reserve/done.html'), name='schoolbusreservedone'),
     url(r'^reserve/seats/$', reserve_views.GetSeatsInfo.as_view(), name='seatsinfo')
 ]

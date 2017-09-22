@@ -80,6 +80,7 @@
             }
             $.post('{% url 'login' %}', $('#loginform').serialize(),
                 function (data) {
+                    const inputTag = $('#inputUsername');
                     if (data['status']) {
                         location.href = '{% url 'index' %}';
                     } else {

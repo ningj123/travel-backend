@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    Appreciate
+{% endblock %}
+
+{% block exthead %}
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+
+        .logo {
+            margin-top: 150px;
+        }
+
+        .logo img {
+            margin-top: 50px;
+            width: 140px;
+        }
+
+        button {
+            padding: 12px 45px !important;
+            border-radius: 30px !important;
+            margin-top: 100px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <header class="logo text-center">
+        <p class="h2">感谢您选择智慧出行</p>
+        <img src="{% static 'login/logo131.jpg' %}" class="img-circle">
+    </header>
+
+    <section class="text-center">
+        <button class="btn btn-default btn-lg" onclick="location.href='{% url 'index' %}'">返回首页</button>
+    </section>
+{% endblock %}

@@ -9,6 +9,9 @@ from .models import SchoolBusReserve as Reserve
 
 
 class SchoolBusReserve(LoginRequiredMixin, TemplateView):
+    '''
+    校车预约模块
+    '''
     template_name = 'reserve/school-bus.html'
 
     def get_context_data(self, **kwargs):
@@ -22,6 +25,8 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
             if timezone.now().strftime('%H:%M') <= t.date_schedule:
                 times.append(t)
         kwargs['times'] = sorted(times, key=lambda x: x.date_schedule)
+        # 依据时间重排序
+        # Template上下文：目前的班次，用于渲染选择select下的option班次列表
         return kwargs
 
     def get(self, request, *args, **kwargs):
@@ -29,9 +34,14 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
         now = Reserve.objects.filter(user=request.user, is_done=False)
         if now:
             context['nowpk'] = now[0].pk
+        # 判断当前用户有无进行中预约
         return self.render_to_response(context)
 
     def post(self, request):
+        '''
+        处理用户的校车预约申请
+        :return: 正常：序列化的SchoolBusReserve，JSON 错误：{status: 1}
+        '''
         try:
             ts = SchoolBusTimeSchedules.objects.get(pk=int(request.POST.get('pk', False)))
         except:
@@ -53,11 +63,21 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
 
 
 class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
+    '''
+    校车预约成功模块
+    主要处理取消以及已乘坐操作
+    '''
     template_name = 'reserve/school-bus-success.html'
     model = Reserve
     context_object_name = 'reserve'
 
     def check_object(self, request, obj):
+        '''
+        检查SchoolBusReserve的属主user是否是当前用户，权限控制
+        :param request: HttpRequest
+        :param obj: 检查SchoolBusReserve的属主user是否是当前用户
+        :return: pass or 抛出404错误
+        '''
         if request.user == obj.user:
             pass
         else:
@@ -72,6 +92,9 @@ class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
 
 
     def delete(self, request, *args, **kwargs):
+        '''
+        通过HTTP DELETE方法处理取消预约
+        '''
         object = self.get_object()
         self.check_object(request, object)
         object.schoolbus.num_reserve = object.schoolbus.num_reserve - 1
@@ -82,6 +105,9 @@ class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
         })
 
     def put(self, request, *args, **kwargs):
+        '''
+        通过HTTP PUT方法更新用户的已乘坐信息
+        '''
         object = self.get_object()
         self.check_object(request, object)
         object.is_done = True
@@ -93,9 +119,16 @@ class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
 
 
 class GetSeatsInfo(LoginRequiredMixin, View):
+    '''
+    取得班次座位信息模块
+    配合前端的Ajax请求
+    '''
     raise_exception = True
 
     def post(self, request):
+        '''
+        :return: 序列化的SchoolBus，JSON
+        '''
         try:
             ts = SchoolBusTimeSchedules.objects.get(pk=int(request.POST.get('pk', False)))
         except:

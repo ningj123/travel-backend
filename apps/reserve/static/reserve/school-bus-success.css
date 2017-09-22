@@ -1,3 +1,7 @@
+body {
+    background-color: #fafafa;
+}
+
 header {
     margin-top: 15px;
 }
@@ -17,7 +21,6 @@ header {
 .reserveinfo {
     margin: 100px 5%;
 }
-
 
 .reserve-time,
 .reserve-date {

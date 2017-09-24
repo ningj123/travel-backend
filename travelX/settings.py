@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'reserve',
 
     'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -97,3 +98,9 @@ MEDIA_URL = '/media/'
 AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = '/login/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}

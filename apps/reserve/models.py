@@ -31,7 +31,7 @@ class SchoolBusWeekSchedules(models.Model):
 class SchoolBus(models.Model):
     schedule = models.ForeignKey(SchoolBusTimeSchedules, verbose_name="时刻")
     num_reserve = models.IntegerField(default=0, verbose_name="预约人数")
-    num_seats = models.IntegerField(blank=True, null=True, verbose_name="总座位数")
+    num_seats = models.IntegerField(blank=True, null=True, default=47, verbose_name="总座位数")
     date = models.DateField(default=timezone.now)
 
     def __str__(self):

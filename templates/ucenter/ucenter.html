@@ -2,6 +2,8 @@
 
 {% load staticfiles %}
 
+{% load ucenter %}
+
 {% block exttitle %}
     个人中心
 {% endblock %}
@@ -17,7 +19,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12">
-                    <i class="glyphicon glyphicon-chevron-left returnicon" onclick="location.href='{% url 'index' %}'"></i>
+                    <i class="glyphicon glyphicon-chevron-left returnicon"
+                       onclick="location.href='{% url 'index' %}'"></i>
                 </div>
             </div>
             <div class="row userinfo text-center">
@@ -34,10 +37,36 @@
             </div>
             <div class="row text-center statusnav">
                 <div class="col-xs-6">
-                    <p class="activenav" id="now">进行中</p>
+                    <p class="activenav" id="nownav">进行中</p>
                 </div>
                 <div class="col-xs-6">
-                    <p id="done">已完成</p>
+                    <p id="donenav">已完成</p>
+                </div>
+            </div>
+            <div class="row" id="now">
+                <div class="col-xs-12">
+                    {% for reserve in user.get_now_reserve %}
+                        {% parse_single_reserve_wrapper_obj reserve as sbs %}
+                        <div class="media recordli" style="cursor: pointer"
+                        {% if reserve.reserve_type == 1 %}
+                            onclick="location.href='{% url 'schoolbusreservesuccess' reserve.reserve_pk %}'"
+                        {% else reserve.reserve_type == 2 %}>
+                        {% endif %}
+                            <div class="media-left">
+                                <a>
+                                    <img src="{% static 'ucenter/1.png' %}" class="media-object" style="margin-top: 10px">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">预约时间：{{ sbs.date_reserve | date:'m.d日H:i' }}</h4>
+                                <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}专车{% endif %}</p>
+                                <p style="color: #8f8f8f">发车时刻：{{ sbs.schoolbus.schedule.date_schedule }}</p>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -46,18 +75,20 @@
     <section class="listfooter">
         <div class="container-fluid">
             <div class="listfooterli">
-                <p><i class="icon iconfont icon-dianhua" style="color: orange"></i>&nbsp;&nbsp;联系我们<i class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
+                <p><i class="icon iconfont icon-dianhua" style="color: orange"></i>&nbsp;&nbsp;联系我们<i
+                        class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
             </div>
             <div class="listfooterli">
-                <p><i class="icon iconfont icon-shu" style="color: orangered"></i>&nbsp;&nbsp;使用协议<i class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
+                <p><i class="icon iconfont icon-shu" style="color: orangered"></i>&nbsp;&nbsp;使用协议<i
+                        class="glyphicon glyphicon-chevron-right pull-right goto"></i></p>
             </div>
         </div>
     </section>
 
 
     <script>
-        let nownavtag = $('#now');
-        let donenavtag = $('#done');
+        let nownavtag = $('#nownav');
+        let donenavtag = $('#donenav');
         nownavtag.click(function () {
             nownavtag.addClass('activenav');
             donenavtag.removeClass('activenav');

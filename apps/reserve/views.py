@@ -6,6 +6,7 @@ from django.http import HttpResponseNotFound, JsonResponse, Http404
 
 from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus
 from .models import SchoolBusReserve as Reserve
+from users.models import UcenterReserveWrapper
 
 
 class SchoolBusReserve(LoginRequiredMixin, TemplateView):
@@ -18,7 +19,7 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
         if 'view' not in kwargs:
             kwargs['view'] = self
 
-        week = int(timezone.now().strftime('%w'))
+        week = int(timezone.now().weekday() + 1)
         ws = SchoolBusWeekSchedules.objects.get(week=week)
         times = []
         for t in ws.time.all():
@@ -83,13 +84,11 @@ class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
         else:
             raise Http404
 
-
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.check_object(request, self.object)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-
 
     def delete(self, request, *args, **kwargs):
         '''
@@ -140,3 +139,17 @@ class GetSeatsInfo(LoginRequiredMixin, View):
             'num_reserve': b.num_reserve,
             'remain': b.num_seats - b.num_reserve
         })
+
+
+# Signals处理
+# 类钩子方法以及回调函数
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
+@receiver(post_save, sender=Reserve)
+def auto_wrapper(sender, **kwargs):
+    user, pk, status = kwargs['instance'].user, kwargs['instance'].pk, kwargs['instance'].is_done
+    urw, created = UcenterReserveWrapper.objects.get_or_create(user=user, reserve_pk=pk, reserve_type=1)
+    urw.reserve_status = status
+    urw.save()
+

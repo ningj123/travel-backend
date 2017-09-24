@@ -84,3 +84,9 @@ header {
 .recordli {
     margin: 15px 0 !important;
 }
+
+#done,
+#now {
+    overflow: auto;
+    height: 376px;
+}

@@ -11,6 +11,7 @@
 {% block exthead %}
     <link href="{% static 'ucenter/ucenter.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'ucenter/iconfont.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -43,30 +44,64 @@
                     <p id="donenav">已完成</p>
                 </div>
             </div>
-            <div class="row" id="now">
+            <div class="row animated fadeIn" id="now">
                 <div class="col-xs-12">
                     {% for reserve in user.get_now_reserve %}
                         {% parse_single_reserve_wrapper_obj reserve as sbs %}
                         <div class="media recordli" style="cursor: pointer"
-                        {% if reserve.reserve_type == 1 %}
-                            onclick="location.href='{% url 'schoolbusreservesuccess' reserve.reserve_pk %}'"
-                        {% else reserve.reserve_type == 2 %}>
-                        {% endif %}
+                                {% if reserve.reserve_type == 1 %}
+                             onclick="location.href='{% url 'schoolbusreservesuccess' reserve.reserve_pk %}'"
+                                {% elif reserve.reserve_type == 2 %}
+
+                                {% endif %}>
                             <div class="media-left">
+{#                                TODO: 多种预约类型徐指向不同的图片#}
                                 <a>
-                                    <img src="{% static 'ucenter/1.png' %}" class="media-object" style="margin-top: 10px">
+                                    <img src="{% static 'ucenter/1.png' %}" class="media-object"
+                                         style="margin-top: 10px">
                                 </a>
                             </div>
                             <div class="media-body">
                                 <h4 class="media-heading">预约时间：{{ sbs.date_reserve | date:'m.d日H:i' }}</h4>
-                                <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}专车{% endif %}</p>
+                                <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}
+                                    专车{% endif %}</p>
                                 <p style="color: #8f8f8f">发车时刻：{{ sbs.schoolbus.schedule.date_schedule }}</p>
                             </div>
                         </div>
                         {% if not forloop.last %}
-                        <hr>
+                            <hr>
                         {% endif %}
                     {% endfor %}
+                </div>
+            </div>
+            <div class="row hidden animated fadeIn" id="done">
+                <div class="col-xs-12">
+                    {% for reserve in user.get_done_reserve %}
+                        {% parse_single_reserve_wrapper_obj reserve as sbs %}
+                        <div class="media recordli" style="cursor: pointer"
+                                {% if reserve.reserve_type == 1 %}
+                             onclick="location.href='{% url 'schoolbusreservesuccess' reserve.reserve_pk %}'"
+                                {% elif reserve.reserve_type == 2 %}
+                                {% endif %}
+                        >
+                            <div class="media-left">
+                                <a>
+                                    <img src="{% static 'ucenter/1.png' %}" class="media-object"
+                                         style="margin-top: 10px">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">预约时间：{{ sbs.date_reserve | date:'m.d日H:i' }}</h4>
+                                <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}
+                                    专车{% endif %}</p>
+                                <p style="color: #8f8f8f">发车时刻：{{ sbs.schoolbus.schedule.date_schedule }}</p>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}
+                            <hr>
+                        {% endif %}
+                    {% endfor %}
+
                 </div>
             </div>
         </div>
@@ -87,15 +122,19 @@
 
 
     <script>
-        let nownavtag = $('#nownav');
-        let donenavtag = $('#donenav');
+        const nownavtag = $('#nownav');
+        const donenavtag = $('#donenav');
         nownavtag.click(function () {
             nownavtag.addClass('activenav');
             donenavtag.removeClass('activenav');
+            $('#now').removeClass('hidden');
+            $('#done').addClass('hidden');
         });
         donenavtag.click(function () {
             donenavtag.addClass('activenav');
             nownavtag.removeClass('activenav');
+            $('#now').addClass('hidden');
+            $('#done').removeClass('hidden');
         });
     </script>
 {% endblock %}

@@ -144,7 +144,8 @@ class GetSeatsInfo(LoginRequiredMixin, View):
 # Signals处理
 # 类钩子方法以及回调函数
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
+
 
 @receiver(post_save, sender=Reserve)
 def auto_wrapper(sender, **kwargs):
@@ -153,3 +154,9 @@ def auto_wrapper(sender, **kwargs):
     urw.reserve_status = status
     urw.save()
 
+
+@receiver(post_delete, sender=Reserve)
+def auto_wrapper_delete(sender, **kwargs):
+    print(kwargs['instance'])
+    pk = kwargs['instance'].pk
+    UcenterReserveWrapper.objects.get(reserve_pk=pk).delete()

@@ -54,7 +54,8 @@ class SchoolBusReserve(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.schoolbus.num_reserve = self.schoolbus.num_reserve + 1
+        if not self.is_done:
+            self.schoolbus.num_reserve = self.schoolbus.num_reserve + 1
         self.schoolbus.save()
         super(SchoolBusReserve, self).save()
 

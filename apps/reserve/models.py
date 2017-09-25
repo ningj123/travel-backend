@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-from users.models import User
+from users.models import User, Driver
 
 
 class SchoolBusTimeSchedules(models.Model):
@@ -61,4 +61,43 @@ class SchoolBusReserve(models.Model):
 
     class Meta:
         verbose_name = "校车预约"
+        verbose_name_plural = verbose_name
+
+
+class SpecialCar(models.Model):
+    driver = models.OneToOneField(Driver, verbose_name="专车司机")
+    num_user = models.IntegerField(default=0, verbose_name="搭乘人数")
+    status = models.BooleanField(default=False, verbose_name="状态", help_text="False不能匹配，True可匹配")
+    users = models.ManyToManyField(User, blank=True, verbose_name="乘坐用户")
+
+    def __str__(self):
+        return self.driver.user.username
+
+    class Meta:
+        verbose_name = "专车"
+        verbose_name_plural = verbose_name
+
+
+class SpecialCarTravel(models.Model):
+    PLACE_CHOICE = ((1, "大花岭"), (2, "街道口"), (3, "光谷"), (4, "武昌站"), (5, "汉口火车站"), (6, "武汉站"))
+    user = models.ForeignKey(User, verbose_name="用户")
+    car = models.ForeignKey(SpecialCar, verbose_name="专车")
+    place = models.IntegerField(choices=PLACE_CHOICE,verbose_name="目的地")
+
+    is_done = models.BooleanField(default=False, verbose_name="是否完成")
+    date_travel = models.DateTimeField(default=timezone.now, verbose_name="出行时间")
+
+    def __str__(self):
+        return self.user.username
+
+    @staticmethod
+    def get_all_place():
+        place_list = []
+        for i in SpecialCarTravel.PLACE_CHOICE:
+            place_list.append(i[1])
+        return place_list
+
+
+    class Meta:
+        verbose_name = "专车出行申请"
         verbose_name_plural = verbose_name

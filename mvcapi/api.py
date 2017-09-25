@@ -20,7 +20,7 @@ class APIUserView(viewsets.GenericViewSet):
     serializer_class = UserSerializer
 
     @simple_route()
-    def register(self, request):
+    def signup(self, request):
         data = {
             'username': request.data.get('username', False),
             'password': request.data.get('password', False)

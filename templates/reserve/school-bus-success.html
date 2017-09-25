@@ -52,7 +52,7 @@
             <div class="row reserve-op">
                 <div class="col-xs-12">
                     <button class="btn btn-default pull-left" onclick="onDelete()">取消预约</button>
-                    <button class="btn btn-success pull-right" onclick="onDone()">已乘车</button>
+                    <button class="btn btn-success pull-right {% if reserve.is_done %}disabled{% endif %}" {% if not reserve.is_done %}onclick="onDone()"{% endif %}>已乘车</button>
                 </div>
             </div>
         </div>

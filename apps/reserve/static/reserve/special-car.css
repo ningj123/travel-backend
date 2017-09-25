@@ -1,0 +1,75 @@
+body {
+    background-color: #fafafa;
+}
+
+.bgimgwrapper {
+    top: 0;
+    position: absolute;
+    height: 300px;
+    width: 100%;
+    z-index: -1;
+}
+
+header {
+    margin-top: 15px;
+}
+
+.returnicon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 39px;
+}
+
+.travel {
+    background: #ffffff;
+    height: 450px;
+    border: 1px solid #8f8f8f;
+    border-radius: 15px;
+    margin: 100px 5% 5% 20px;
+}
+
+.travel-header {
+    text-align: center;
+    margin: 15px 5px;
+}
+
+.canum {
+    font-weight: 600;
+}
+
+.order {
+    margin: 90px 5px 20px 5px;
+    font-size: 18px;
+    padding-bottom: 5px;
+}
+
+.order-choice {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+}
+
+#choiceLabel {
+    position: absolute;
+    font-weight: 500;
+}
+
+.order-choice:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.makeorder {
+    margin-top: 120px;
+}
+
+.btn-order {
+    background: linear-gradient(to right, #92bff8, #4ba7e6);
+    color: #ffffff;
+    border-radius: 25px;
+    padding: 10px 50px;
+}

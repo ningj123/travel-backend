@@ -35,8 +35,10 @@ class User(AbstractUser):
 class Driver(models.Model):
     user = models.OneToOneField(User, verbose_name="关联的用户")
     number = models.CharField(max_length=10, blank=True, verbose_name="车牌号")
-    type = models.IntegerField(choices=((1, "小车司机"), (2, "校车司机"), (3, "管理者")), verbose_name="司机类型")
-    status = models.IntegerField(choices=((0, "非空闲"), (1, "空闲")), default=0, verbose_name="状态")
+    type = models.IntegerField(choices=((1, "专车司机"), (2, "校车司机"), (3, "管理者")), verbose_name="司机类型")
+
+    def __str__(self):
+        return self.user.username
 
     class Meta:
         verbose_name = "司机"

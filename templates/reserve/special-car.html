@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    专车出行
+{% endblock %}
+
+{% block exthead %}
+    <link href="{% static 'reserve/special-car.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <div class="bgimgwrapper" style="background-image: url({% static 'reserve/bgb.jpg' %})"></div>
+
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <i class="glyphicon glyphicon-chevron-left returnicon pull-left"
+                       onclick="location.href='{% url 'index' %}'"></i>
+                    <p class="h4" style="color: white; font-weight: 600">专车出行</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="travel">
+        <div class="container-fluid">
+            <div class="row travel-header">
+                <p class="h4" style="line-height: 30px">当前可用专车数：<span class="canum">{{ carnum }}</span>&nbsp;辆</p>
+            </div>
+            <div class="row order">
+                <label for="choicePlace" id="choiceLabel"><i class="glyphicon glyphicon-send"
+                                                             style="color: #ffb81a"></i>&nbsp;&nbsp;选择目的地</label>
+                <select class="form-control order-choice" id="choicePlace" onchange="choice()">
+                    <option hidden></option>
+                    {% for place in place_list %}
+                        <option value="{{ forloop.counter }}">{{ place }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="row makeorder text-center">
+                <button class="btn btn-lg btn-order" onclick="onSubmit()">开始匹配</button>
+            </div>
+        </div>
+    </section>
+
+    {% if nowpk %}
+        <section onclick="location.href='{% url 'specailcarmatch' nowpk %}'" style="cursor: pointer;">
+            <div class="alert alert-info alert-dismissible text-center" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                您有正在进行专车匹配
+            </div>
+        </section>
+    {% endif %}
+
+    <script>
+        function choice() {
+            $('#choiceLabel')[0].innerHTML = '';
+        }
+
+        function onSubmit() {
+            const choiceTag = $('#choicePlace');
+            if (choiceTag.val() === '') {
+                alert("请先选择地点");
+                return false;
+            }
+            $.post('{% url 'specialcartravel' %}', {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                place: choiceTag.val()
+            }, function (data) {
+
+            }, "json");
+        }
+    </script>
+{% endblock %}

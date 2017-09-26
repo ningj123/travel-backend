@@ -202,17 +202,13 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
             context['nowpk'] = now[0].car.pk
         return self.render_to_response(context)
 
-    def post(self, request):
-        place = request.POST.get('place', False)
-        if Travel.objects.filter(user=request.user, is_done=False):
-            return JsonResponse({
-                'status': -1
-            })
-        # 匹配流程
-        if request.POST.get('car_list', False):
-            can_match_car = request.POST['car_list']
+    @staticmethod
+    def match(request, place, refresh= False, car_list=None):
+        if car_list or refresh:
+            can_match_car = car_list
         else:
             can_match_car = SpecialCar.objects.filter(status=True)
+
         if can_match_car:
             for car in can_match_car:
                 if car.num_user < 4:
@@ -222,22 +218,27 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
                     if car.num_user == 4:
                         car.status = False
                     car.save()
-                    return JsonResponse({
+                    return {
                         'status': 1,
                         'carpk': car.pk
-                    })
-            # 没有满足条件（已坐满）的车返回JSON：{'status': 0}
-            return JsonResponse({
+                    }
+            return {
                 'status': 0
-            })
+            }
+        return {
+            'status': 0
+        }
 
-        else:
-            # 没有可用专车返回JSON：{'status': 0}
+    def post(self, request):
+        place = request.POST.get('place', False)
+        if Travel.objects.filter(user=request.user, is_done=False):
             return JsonResponse({
-                'status': 0
+                'status': -1
             })
+        # 匹配流程
+        return JsonResponse(SpecialCarTravel.match(request, place))
 
-
+# TODO: 是否需要对用户行为做时间限制
 class SpecialCarMatch(LoginRequiredMixin, DetailView):
     template_name = 'reserve/special-car-match.html'
     model = SpecialCar
@@ -254,7 +255,10 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
             raise Http404
 
     def get(self, request, *args, **kwargs):
-        print(request.path)
+        try:
+            print(request.session['oldcarpk'])
+        except:
+            pass
         self.object = self.get_object()
         self.check_object(request, self.object)
         context = self.get_context_data(object=self.object)
@@ -286,7 +290,7 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
             'status': 1
         })
 
-    def post(self, request,*args, **kwargs):
+    def post(self, request, *args, **kwargs):
         '''
         通过HTTP POST方法处理崇拜新匹配
         '''
@@ -299,15 +303,18 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
         can_match_car = SpecialCar.objects.filter(status=True)
         for opk in request.session['oldcarpk']:
             can_match_car = can_match_car.exclude(pk=opk)
-        data = {
-            "car_list": can_match_car
-        }
-        response = http_request.urlopen(resolve_url('specialcartravel'), data)
-        result = json.load(response)
-        print(result)
-        return JsonResponse({
-            'status': 1
-        })
+        now_special_car_travel = request.user.get_last_special_car_travel()
+        place = now_special_car_travel.place
+        result = SpecialCarTravel.match(request, place, refresh=True, car_list=can_match_car)
+        if result['status']:
+            now_special_car_travel.delete()
+            obj.num_user = obj.num_user - 1
+            obj.users.remove(request.user)
+            obj.status = True
+            obj.save()
+            return JsonResponse(result)
+        else:
+            return JsonResponse(result)
 
 
 # Signals处理

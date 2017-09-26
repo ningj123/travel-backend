@@ -136,13 +136,13 @@
                             opbtn.removeClass('btn-success');
                             opbtn.addClass('btn-warning');
                             selftag.addClass('accept');
-                            return;
+                            return true;
                         } else {
                             opbtn.text('接受匹配');
                             opbtn.removeClass('btn-warning');
                             opbtn.addClass('btn-success');
                             selftag.removeClass('accept');
-                            return;
+                            return true;
                         }
                     }
                 },
@@ -155,7 +155,11 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}',
             },
             function (data) {
-
+                if (data['status'] === 1) {
+                    location.href = '{% url 'specialcartravel' %}' + data['carpk'];
+                } else {
+                    alert("当前无可用车辆");
+                }
             }, "json")
         }
     </script>

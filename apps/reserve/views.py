@@ -1,13 +1,8 @@
-from urllib import parse
-from urllib import request as http_request
-import json
-
 from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.http import HttpResponseNotFound, JsonResponse, Http404
-from django.shortcuts import resolve_url
 
 from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar
 from .models import SpecialCarTravel as Travel
@@ -203,7 +198,7 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
     @staticmethod
-    def match(request, place, refresh= False, car_list=None):
+    def match(request, place, refresh=False, car_list=None):
         if car_list or refresh:
             can_match_car = car_list
         else:
@@ -238,6 +233,7 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
         # 匹配流程
         return JsonResponse(SpecialCarTravel.match(request, place))
 
+
 # TODO: 是否需要对用户行为做时间限制
 class SpecialCarMatch(LoginRequiredMixin, DetailView):
     template_name = 'reserve/special-car-match.html'
@@ -255,10 +251,6 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
             raise Http404
 
     def get(self, request, *args, **kwargs):
-        try:
-            print(request.session['oldcarpk'])
-        except:
-            pass
         self.object = self.get_object()
         self.check_object(request, self.object)
         context = self.get_context_data(object=self.object)
@@ -292,7 +284,7 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         '''
-        通过HTTP POST方法处理崇拜新匹配
+        通过HTTP POST方法处理重新匹配
         '''
         try:
             request.session['oldcarpk'] = request.session['oldcarpk']

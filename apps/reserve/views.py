@@ -314,7 +314,7 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
 def auto_wrapper_for_travel(sender, **kwargs):
     # SpecialCarTravel模型的save方法的信号回调函数
     # 每当一个SpecialCarTravel被创建时就会在UcenterReserveWrapper中添加一个关联
-    user, pk, status = kwargs['instance'].user, kwargs['instance'].car.pk, kwargs['instance'].is_done
+    user, pk, status = kwargs['instance'].user, kwargs['instance'].pk, kwargs['instance'].is_done
     urw, created = UcenterReserveWrapper.objects.get_or_create(
         user=user,
         reserve_pk=pk,
@@ -328,5 +328,5 @@ def auto_wrapper_for_travel(sender, **kwargs):
 def auto_wrapper_delete_for_travel(sender, **kwargs):
     # SpecialCarTravel模型的delete方法的信号回掉函数
     # 每当一个SpecialCarTravel被销毁时就会同步销毁在UcenterReserveWrapper中的关联
-    pk = kwargs['instance'].car.pk
+    pk = kwargs['instance'].pk
     UcenterReserveWrapper.objects.get(reserve_pk=pk, reserve_type=2).delete()

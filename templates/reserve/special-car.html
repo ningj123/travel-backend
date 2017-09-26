@@ -71,7 +71,13 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}',
                 place: choiceTag.val()
             }, function (data) {
-
+                if (data['status'] === 1) {
+                    location.href = '{% url 'specialcartravel'  %}' + data['carpk'];
+                } else if (data['status'] === -1) {
+                    alert("您有进行中的专车申请");
+                } else {
+                    alert("当前无可用车辆");
+                }
             }, "json");
         }
     </script>

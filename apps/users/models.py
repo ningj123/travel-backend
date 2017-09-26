@@ -27,6 +27,12 @@ class User(AbstractUser):
     def get_done_reserve(self):
         return self.ucenterreservewrapper_set.all().filter(reserve_status=True)
 
+    def get_last_special_car_travel(self):
+        try:
+            return self.specialcartravel_set.get(is_done=False)
+        except:
+            pass
+
     class Meta:
         verbose_name = "用户"
         verbose_name_plural = verbose_name

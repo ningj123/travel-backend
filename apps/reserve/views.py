@@ -1,8 +1,13 @@
+from urllib import parse
+from urllib import request as http_request
+import json
+
 from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.http import HttpResponseNotFound, JsonResponse, Http404
+from django.shortcuts import resolve_url
 
 from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar
 from .models import SpecialCarTravel as Travel
@@ -26,17 +31,17 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
         for t in ws.time.all():
             if timezone.now().strftime('%H:%M') <= t.date_schedule:
                 times.append(t)
-        kwargs['times'] = sorted(times, key=lambda x: x.date_schedule)
         # 依据时间重排序
         # Template上下文：目前的班次，用于渲染选择select下的option班次列表
+        kwargs['times'] = sorted(times, key=lambda x: x.date_schedule)
         return kwargs
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
+        # 判断当前用户有无进行中预约
         now = Reserve.objects.filter(user=request.user, is_done=False)
         if now:
             context['nowpk'] = now[0].pk
-        # 判断当前用户有无进行中预约
         return self.render_to_response(context)
 
     def post(self, request):
@@ -77,7 +82,7 @@ class SchoolBusReserveSuccess(LoginRequiredMixin, DetailView):
         '''
         检查SchoolBusReserve的属主user是否是当前用户，权限控制
         :param request: HttpRequest
-        :param obj: 检查SchoolBusReserve的属主user是否是当前用户
+        :param obj: 当前SchoolBusReserve对象
         :return: pass or 抛出404错误
         '''
         if request.user == obj.user:
@@ -149,7 +154,7 @@ from django.db.models.signals import post_save, post_delete
 
 
 @receiver(post_save, sender=Reserve)
-def auto_wrapper(sender, **kwargs):
+def auto_wrapper_for_reserve(sender, **kwargs):
     # SchoolBusReserve模型的save方法的信号回调函数
     # 每当一个SchoolBusReserve被创建时就会在UcenterReserveWrapper中添加一个关联
     user, pk, status = kwargs['instance'].user, kwargs['instance'].pk, kwargs['instance'].is_done
@@ -159,12 +164,14 @@ def auto_wrapper(sender, **kwargs):
 
 
 @receiver(post_delete, sender=Reserve)
-def auto_wrapper_delete(sender, **kwargs):
+def auto_wrapper_delete_for_reserve(sender, **kwargs):
     # SchoolBusReserve模型的delete方法的信号回掉函数
-    # 每当一个SchoolBusReserve被销毁时就会同步销毁在每当一个Reserve被创建时就会在UcenterReserveWrapper中添加一个关联的关联
-    print(kwargs['instance'])
+    # 每当一个SchoolBusReserve被销毁时就会同步销毁在UcenterReserveWrapper中的的关联
     pk = kwargs['instance'].pk
-    UcenterReserveWrapper.objects.get(reserve_pk=pk).delete()
+    UcenterReserveWrapper.objects.get(reserve_pk=pk, reserve_type=1).delete()
+
+
+# TODO 完成专车的Signals回调处理
 
 
 class SpecialCarTravel(LoginRequiredMixin, TemplateView):
@@ -176,27 +183,36 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         if 'view' not in kwargs:
             kwargs['view'] = self
-        kwargs['carnum'] = SpecialCar.objects.filter(status=True).__len__()
         # carnum上下文：当前可用专车数
-        kwargs['place_list'] = Travel.get_all_place()
+        kwargs['carnum'] = SpecialCar.objects.filter(status=True).__len__()
         # place_list上下文：目的地列表
+        kwargs['place_list'] = Travel.get_all_place()
         return kwargs
 
     def get(self, request, *args, **kwargs):
+        # 重置重新匹配标志
+        try:
+            del request.session['oldcarpk']
+        except:
+            pass
         context = self.get_context_data(**kwargs)
+        # 判断当前用户有无进行中预约
         now = Travel.objects.filter(user=request.user, is_done=False)
         if now:
-            context['nowpk'] = now[0].pk
-        # 判断当前用户有无进行中预约
+            context['nowpk'] = now[0].car.pk
         return self.render_to_response(context)
 
     def post(self, request):
         place = request.POST.get('place', False)
         if Travel.objects.filter(user=request.user, is_done=False):
             return JsonResponse({
-                'status': 0
+                'status': -1
             })
-        can_match_car = SpecialCar.objects.filter(status=True)
+        # 匹配流程
+        if request.POST.get('car_list', False):
+            can_match_car = request.POST['car_list']
+        else:
+            can_match_car = SpecialCar.objects.filter(status=True)
         if can_match_car:
             for car in can_match_car:
                 if car.num_user < 4:
@@ -204,16 +220,19 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
                     car.users.add(request.user)
                     car.num_user = car.num_user + 1
                     if car.num_user == 4:
-                        car.save()
+                        car.status = False
+                    car.save()
                     return JsonResponse({
                         'status': 1,
                         'carpk': car.pk
                     })
+            # 没有满足条件（已坐满）的车返回JSON：{'status': 0}
             return JsonResponse({
                 'status': 0
             })
 
         else:
+            # 没有可用专车返回JSON：{'status': 0}
             return JsonResponse({
                 'status': 0
             })
@@ -223,3 +242,92 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
     template_name = 'reserve/special-car-match.html'
     model = SpecialCar
     context_object_name = 'carmatch'
+
+    def check_object(self, request, obj):
+        '''
+        检查当前SpecialCar对象的用户中（及当前车辆的乘坐者）是否包含当前请求用户
+        :param request: HttpRequest
+        :param obj: 当前SpecialCar对象
+        :return: 抛出Http404异常
+        '''
+        if not request.user in obj.users.all():
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        print(request.path)
+        self.object = self.get_object()
+        self.check_object(request, self.object)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def delete(self, request, *args, **kwargs):
+        '''
+        通过HTTP DELETE方法处理取消匹配
+        '''
+        obj = self.get_object()
+        obj.num_user = obj.num_user - 1
+        obj.users.remove(request.user)
+        obj.status = True
+        obj.save()
+        last_travel = request.user.get_last_special_car_travel()
+        last_travel.delete()
+        return JsonResponse({
+            'status': 1
+        })
+
+    def put(self, request, *args, **kwargs):
+        '''
+        通过HTTP PUT方法处理接受匹配以及撤销
+        '''
+        last_travel = request.user.get_last_special_car_travel()
+        last_travel.is_accept = not last_travel.is_accept
+        last_travel.save()
+        return JsonResponse({
+            'status': 1
+        })
+
+    def post(self, request,*args, **kwargs):
+        '''
+        通过HTTP POST方法处理崇拜新匹配
+        '''
+        try:
+            request.session['oldcarpk'] = request.session['oldcarpk']
+        except:
+            request.session['oldcarpk'] = []
+        obj = self.get_object()
+        request.session['oldcarpk'].append(obj.pk)
+        can_match_car = SpecialCar.objects.filter(status=True)
+        for opk in request.session['oldcarpk']:
+            can_match_car = can_match_car.exclude(pk=opk)
+        data = {
+            "car_list": can_match_car
+        }
+        response = http_request.urlopen(resolve_url('specialcartravel'), data)
+        result = json.load(response)
+        print(result)
+        return JsonResponse({
+            'status': 1
+        })
+
+
+# Signals处理
+@receiver(post_save, sender=Travel)
+def auto_wrapper_for_travel(sender, **kwargs):
+    # SpecialCarTravel模型的save方法的信号回调函数
+    # 每当一个SpecialCarTravel被创建时就会在UcenterReserveWrapper中添加一个关联
+    user, pk, status = kwargs['instance'].user, kwargs['instance'].car.pk, kwargs['instance'].is_done
+    urw, created = UcenterReserveWrapper.objects.get_or_create(
+        user=user,
+        reserve_pk=pk,
+        reserve_type=2,
+    )
+    urw.reserve_status = status
+    urw.save()
+
+
+@receiver(post_delete, sender=Travel)
+def auto_wrapper_delete_for_travel(sender, **kwargs):
+    # SpecialCarTravel模型的delete方法的信号回掉函数
+    # 每当一个SpecialCarTravel被销毁时就会同步销毁在UcenterReserveWrapper中的关联
+    pk = kwargs['instance'].car.pk
+    UcenterReserveWrapper.objects.get(reserve_pk=pk, reserve_type=2).delete()

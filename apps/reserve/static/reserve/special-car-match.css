@@ -1,0 +1,109 @@
+body {
+    background-color: #fafafa;
+}
+
+.bgimgwrapper {
+    top: 0;
+    position: absolute;
+    height: 239px;
+    width: 100%;
+    z-index: -1;
+}
+
+header {
+    height: 229px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+}
+
+.returnicon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 39px;
+}
+
+.driver-info {
+    margin: 40px 5%;
+}
+
+.davatar {
+    width: 100px;
+    height: 100px;
+}
+
+.media-body {
+    height: 100px;
+}
+
+.media-body p {
+    line-height: 33px;
+    margin: 0 0 0 20px ;
+}
+
+.phoneicon {
+    font-size: 40px;
+    color: #ffffff;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.user-info {
+    height: 100px;
+    background: white;
+    margin: 30px 5%;
+    border: 1px solid #8f8f8f;
+    border-radius: 15px;
+}
+
+.liimg {
+    margin: 15px 0 15px 20px;
+    width: 70px;
+}
+
+.user-info .media-body p {
+    line-height: 50px;
+}
+
+@media screen and (max-width: 350px){
+    .media-body p {
+        line-height: 20px;
+        margin: 0 0 0 20px;
+    }
+
+    .user-info .media-body p {
+        line-height: 30px;
+    }
+
+
+}
+
+.self {
+    border: 2px solid #ff9614;
+}
+
+.accept {
+    border: 2px solid #00ff00;
+}
+
+.userrefreshicon,
+.userphoneicon {
+    cursor: pointer;
+    font-size: 30px;
+    margin: 35px 10px;
+}
+
+.userrefreshicon {
+    color: #ff9614;
+}
+
+.travel-operation {
+    margin: 30px 5%;
+}
+
+.travel-operation button {
+    border-radius: 20px;
+    padding: 10px 30px;
+}

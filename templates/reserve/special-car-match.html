@@ -3,9 +3,160 @@
 {% load staticfiles %}
 
 {% block exttitle %}
-匹配
+    匹配
 {% endblock %}
 
 {% block exthead %}
     <link href="{% static 'reserve/special-car-match.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+    <div class="bgimgwrapper" style="background-image: url({% static 'reserve/bgp.jpg' %})"></div>
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <i class="glyphicon glyphicon-chevron-left returnicon pull-left"
+                       onclick="location.href='{% url 'specialcartravel' %}'"></i>
+                    <p class="h4" style="font-weight: 600; color: #ffffff">专车匹配信息</p>
+                </div>
+            </div>
+            <div class="row driver-info">
+                <div class="media">
+                    <div class="media-left">
+                        <a href="#">
+                            <img class="media-object img-circle davatar" src="{% static 'reserve/davatar.png' %}" \\>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <p>司机：{{ carmatch.driver.user.truename }}</p>
+                        <p>车牌号：{{ carmatch.driver.number }}</p>
+                        <p>手机号：{{ carmatch.driver.user.username }}</p>
+                    </div>
+                    <div class="media-right" style="height: 100px">
+                        <i class="glyphicon glyphicon-earphone phoneicon"
+                           onclick="location.href='tel://{{ carmatch.driver.user.username }}'"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% for user in carmatch.users.all %}
+        <section class="user-info {% if user == request.user %}self{% endif %} {% if user.get_last_special_car_travel.is_accept %}accept{% endif %}">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="media">
+                        <div class="media-left">
+                            {% if forloop.counter == 1 %}
+                                <img class="media-object liimg" src="{% static 'reserve/1.png' %}">
+                            {% elif forloop.counter == 2 %}
+                                <img class="media-object liimg" src="{% static 'reserve/2.png' %}">
+                            {% elif forloop.counter == 3 %}
+                                <img class="media-object liimg" src="{% static 'reserve/3.png' %}">
+                            {% elif forloop.counter == 4 %}
+                                <img class="media-object liimg" src="{% static 'reserve/4.png' %}">
+                            {% endif %}
+                        </div>
+                        <div class="media-body">
+                            {#                        TODO: 是否添加姓名的显示？#}
+                            <p>手机号：{{ user.username }}</p>
+                            <p>目的地：{{ user.get_last_special_car_travel.get_place_display }}</p>
+                        </div>
+                        {% if not user == request.user %}
+                            <div class="media-left">
+                                <i class="glyphicon glyphicon-earphone userphoneicon"
+                                   onclick="location.href='tel://{{ user.username }}'"></i>
+                            </div>
+                        {% endif %}
+                        {% if user == request.user %}
+                            <div class="media-left">
+                                <i class="glyphicon glyphicon-refresh userrefreshicon" onclick="onRefresh()"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endfor %}
+
+    <section class="travel-operation">
+        <div class="container-fluid">
+            <div class="row">
+                <button type="button" class="btn btn-default pull-left" onclick="onDelete()">取消匹配</button>
+                {% if user.get_last_special_car_travel.is_accept %}
+                <button type="button" class="btn btn-warning pull-right" onclick="onAccept()" id="opbtn">取消接受</button>
+                {% else %}
+                <button type="button" class="btn btn-success pull-right" onclick="onAccept()" id="opbtn">接受匹配</button>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function onDelete() {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                     xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                     // TODO: 应该有更好的方法来设置CSRF头
+                }
+            });
+            $.ajax({
+                type: 'DELETE',
+                url: document.URL,
+                dataTypeString: 'json',
+                success: (data) => {
+                    if (data['status']) {
+                        alert("取消成功");
+                        location.href = '{% url 'specialcartravel' %}';
+                    }
+                },
+                error: (err) => console.error(err)
+            })
+        }
+
+        function onAccept() {
+            $('.self').addClass('accept');
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                     xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                     // TODO: 应该有更好的方法来设置CSRF头
+                }
+            });
+            $.ajax({
+                type: 'PUT',
+                url: document.URL,
+                dataTypeString: 'json',
+                success: (data) => {
+                    if (data['status']) {
+                        const opbtn = $('#opbtn');
+                        const selftag = $('.self');
+                        if (opbtn.text() === '接受匹配') {
+                            opbtn.text('取消接受');
+                            opbtn.removeClass('btn-success');
+                            opbtn.addClass('btn-warning');
+                            selftag.addClass('accept');
+                            return;
+                        } else {
+                            opbtn.text('接受匹配');
+                            opbtn.removeClass('btn-warning');
+                            opbtn.addClass('btn-success');
+                            selftag.removeClass('accept');
+                            return;
+                        }
+                    }
+                },
+                error: (err) => console.error(err)
+            })
+        }
+
+        function onRefresh() {
+            $.post(document.URL, {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            function (data) {
+
+            }, "json")
+        }
+    </script>
 {% endblock %}

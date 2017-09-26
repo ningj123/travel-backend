@@ -84,6 +84,7 @@ class SpecialCarTravel(models.Model):
     car = models.ForeignKey(SpecialCar, verbose_name="专车")
     place = models.IntegerField(choices=PLACE_CHOICE,verbose_name="目的地")
 
+    is_accept = models.BooleanField(default=False, verbose_name="是否接受")
     is_done = models.BooleanField(default=False, verbose_name="是否完成")
     date_travel = models.DateTimeField(default=timezone.now, verbose_name="出行时间")
 
@@ -101,3 +102,4 @@ class SpecialCarTravel(models.Model):
     class Meta:
         verbose_name = "专车出行申请"
         verbose_name_plural = verbose_name
+        ordering = ['-date_travel']

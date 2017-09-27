@@ -17,7 +17,7 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <i class="glyphicon glyphicon-chevron-left returnicon pull-left"
-                       onclick="location.href='{% url 'specialcartravel' %}'"></i>
+                       onclick="window.location.href = document.referrer"></i>
                     <p class="h4" style="font-weight: 600; color: #ffffff">专车匹配信息</p>
                 </div>
             </div>
@@ -25,7 +25,7 @@
                 <div class="media">
                     <div class="media-left">
                         <a href="#">
-                            <img class="media-object img-circle davatar" src="{% static 'reserve/davatar.png' %}" \\>
+                            <img class="media-object img-circle davatar" src="{% static 'reserve/davatar.png' %}" >
                         </a>
                     </div>
                     <div class="media-body">
@@ -42,7 +42,7 @@
         </div>
     </header>
 
-    {% for user in carmatch.users.all %}
+    {% for user in carmatch.get_all_users_in_car %}
         <section class="user-info {% if user == request.user %}self{% endif %} {% if user.get_last_special_car_travel.is_accept %}accept{% endif %}">
             <div class="container-fluid">
                 <div class="row">

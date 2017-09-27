@@ -52,20 +52,33 @@
                                 {% if reserve.reserve_type == 1 %}
                              onclick="location.href='{% url 'schoolbusreservesuccess' reserve.reserve_pk %}'"
                                 {% elif reserve.reserve_type == 2 %}
-
+                             onclick="location.href='{% url 'specailcarmatch' sbs.car.pk %}'"
                                 {% endif %}>
                             <div class="media-left">
-{#                                TODO: 多种预约类型需指向不同的图片#}
-                                <a>
-                                    <img src="{% static 'ucenter/1.png' %}" class="media-object"
-                                         style="margin-top: 10px">
-                                </a>
+                                {% if reserve.reserve_type == 1 %}
+                                    <a>
+                                        <img src="{% static 'ucenter/1.png' %}" class="media-object"
+                                             style="margin-top: 10px">
+                                    </a>
+                                {% elif reserve.reserve_type == 2 %}
+                                    <a>
+                                        <img src="{% static 'ucenter/2.png' %}" class="media-object"
+                                             style="margin-top: 10px">
+                                    </a>
+                                {% endif %}
                             </div>
                             <div class="media-body">
-                                <h4 class="media-heading">预约时间：{{ sbs.date_reserve | date:'m.d日H:i' }}</h4>
-                                <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}
-                                    专车{% endif %}</p>
-                                <p style="color: #8f8f8f">发车时刻：{{ sbs.schoolbus.schedule.date_schedule }}</p>
+                                {% if reserve.reserve_type == 1 %}
+                                    <h4 class="media-heading">预约时间：{{ sbs.date_reserve | date:'m月d日H:i' }}</h4>
+                                    <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}
+                                        专车{% endif %}</p>
+                                    <p style="color: #8f8f8f">发车时刻：{{ sbs.schoolbus.schedule.date_schedule }}</p>
+                                {% elif reserve.reserve_type == 2 %}
+                                    <h4 class="media-heading">申请时间：{{ sbs.date_travel | date:'m月d日H:i' }}</h4>
+                                    <p style="color: #8f8f8f">类型：{% if reserve.reserve_type == 1 %}校车{% else %}
+                                        专车{% endif %}</p>
+                                    <p style="color: #8f8f8f">目的地：{{ sbs.get_place_display }}</p>
+                                {% endif %}
                             </div>
                         </div>
                         {% if not forloop.last %}

@@ -73,6 +73,9 @@ class SpecialCar(models.Model):
     def __str__(self):
         return self.driver.user.username
 
+    def  get_all_users_in_car(self):
+        return self.users.order_by('-specialcartravel')
+
     class Meta:
         verbose_name = "专车"
         verbose_name_plural = verbose_name

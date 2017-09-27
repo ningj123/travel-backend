@@ -19,7 +19,7 @@
         {% if request.user.is_authenticated %}
             <div class="alert alert-dismissible alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <p>您当前正以&nbsp;<strong>{{ request.user.username }}&nbsp;登录</strong></p>
+                <p>您当前正以&nbsp;<strong>{{ request.user.username }}&nbsp;登录</strong></p>
             </div>
         {% endif %}
         <div class="alert alert-dismissible alert-danger hidden" id="alertTag">
@@ -52,6 +52,14 @@
 
         });
 
+
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+
         function resetForm() {
             $('#alertTag').addClass('hidden');
             $('#alertInfo')[0].innerHTML = '';
@@ -82,7 +90,7 @@
                 function (data) {
                     const inputTag = $('#inputUsername');
                     if (data['status']) {
-                        location.href = '{% url 'index' %}';
+                        location.href = GetQueryString('next')
                     } else {
                         $('#usernameForm').addClass('has-error');
                         $('#passwordForm').addClass('has-error');

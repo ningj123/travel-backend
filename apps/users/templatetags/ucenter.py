@@ -1,6 +1,6 @@
 from django import template
 
-from reserve.models import SchoolBusReserve
+from reserve.models import SchoolBusReserve, SpecialCarTravel
 
 register = template.Library()
 
@@ -12,6 +12,9 @@ def parse_single_reserve_wrapper_obj(obj):
         rtype = obj.reserve_type
         if rtype == 1:
             s = SchoolBusReserve.objects.get(pk=rpk)
+            return s
+        elif rtype == 2:
+            s = SpecialCarTravel.objects.get(pk=rpk)
             return s
     except:
         return None

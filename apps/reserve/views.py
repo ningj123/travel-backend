@@ -16,10 +16,12 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
     '''
     template_name = 'reserve/school-bus.html'
 
-    def get_context_data(self, **kwargs):
-        if 'view' not in kwargs:
-            kwargs['view'] = self
-
+    @staticmethod
+    def generate_time_list():
+        '''
+        静态方法：依据星期以及时间创造一天中的可用班次时间表
+        :return: 一天中的可用班次时间表
+        '''
         week = int(timezone.now().weekday() + 1)
         ws = SchoolBusWeekSchedules.objects.get(week=week)
         times = []
@@ -27,8 +29,13 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
             if timezone.now().strftime('%H:%M') <= t.date_schedule:
                 times.append(t)
         # 依据时间重排序
+        return sorted(times, key=lambda x: x.date_schedule)
+
+    def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
         # Template上下文：目前的班次，用于渲染选择select下的option班次列表
-        kwargs['times'] = sorted(times, key=lambda x: x.date_schedule)
+        kwargs['times'] = SchoolBusReserve.generate_time_list()
         return kwargs
 
     def get(self, request, *args, **kwargs):
@@ -236,6 +243,9 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
 
 # TODO: 是否需要对用户行为做时间限制
 class SpecialCarMatch(LoginRequiredMixin, DetailView):
+    '''
+    专车匹配模块
+    '''
     template_name = 'reserve/special-car-match.html'
     model = SpecialCar
     context_object_name = 'carmatch'
@@ -278,6 +288,8 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
         last_travel = request.user.get_last_special_car_travel()
         last_travel.is_accept = not last_travel.is_accept
         last_travel.save()
+        last_travel.car.status = True
+        last_travel.car.save()
         return JsonResponse({
             'status': 1
         })

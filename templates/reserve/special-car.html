@@ -26,6 +26,7 @@
     </header>
 
     <section class="travel">
+
         <div class="container-fluid">
             <div class="row travel-header">
                 <p class="h4" style="line-height: 30px">当前可用专车数：<span class="canum">{{ carnum }}</span>&nbsp;辆</p>
@@ -40,21 +41,21 @@
                     {% endfor %}
                 </select>
             </div>
+            {% if nowpk %}
+                <section onclick="location.href='{% url 'specailcarmatch' nowpk %}'" style="cursor: pointer;">
+                    <div class="alert alert-info alert-dismissible text-center" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        您有正在进行专车匹配，点击进入
+                    </div>
+                </section>
+            {% endif %}
             <div class="row makeorder text-center">
                 <button class="btn btn-lg btn-order" onclick="onSubmit()">开始匹配</button>
             </div>
         </div>
-    </section>
 
-    {% if nowpk %}
-        <section onclick="location.href='{% url 'specailcarmatch' nowpk %}'" style="cursor: pointer;">
-            <div class="alert alert-info alert-dismissible text-center" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-                您有正在进行专车匹配
-            </div>
-        </section>
-    {% endif %}
+    </section>
 
     <script>
         function choice() {

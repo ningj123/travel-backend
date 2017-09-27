@@ -3,17 +3,24 @@ from django.views.generic.base import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.urls.base import reverse
 
 from .forms import LoginForm, SignupForm
 from .models import User
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+class IndexView(TemplateView):
     template_name = 'index.html'
 
 
 class UcenterView(LoginRequiredMixin, TemplateView):
     template_name = 'ucenter/ucenter.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.usertype == 1:
+            return HttpResponseRedirect(reverse('driverindex'))
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
 
 
 class LoginView(TemplateView):

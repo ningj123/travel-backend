@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from django.http import HttpResponseNotFound, JsonResponse, Http404
 
-from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar
+from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar, Chartered
 from .models import SpecialCarTravel as Travel
 from .models import SchoolBusReserve as Reserve
 from users.models import UcenterReserveWrapper
@@ -358,3 +358,24 @@ def auto_wrapper_delete_for_travel(sender, **kwargs):
     # 每当一个SpecialCarTravel被销毁时就会同步销毁在UcenterReserveWrapper中的关联
     pk = kwargs['instance'].pk
     UcenterReserveWrapper.objects.get(reserve_pk=pk, reserve_type=2).delete()
+
+
+
+class CharteredReserve(TemplateView):
+    template_name = 'reserve/chartered.html'
+
+    def get_context_data(self, **kwargs):
+        if 'view' not in kwargs:
+            kwargs['view'] = self
+        kwargs['chartered'] = Chartered.objects.all()[0]
+        return kwargs
+
+
+
+# TODO: Add Crontab JOB
+
+def auto_create_school_bus():
+    week = int(timezone.now().weekday() + 1)
+    ws = SchoolBusWeekSchedules.objects.get(week=week)
+    for ts in ws.time.all():
+        SchoolBus.objects.create(schedule=ts)

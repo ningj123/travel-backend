@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import SchoolBusTimeSchedules, SchoolBusWeekSchedules, SchoolBus, SchoolBusReserve, SpecialCar, \
-    SpecialCarTravel
+    SpecialCarTravel, Chartered
 
 
 @admin.register(SchoolBusTimeSchedules)
@@ -33,3 +33,9 @@ class SpecialCarAdmin(admin.ModelAdmin):
 @admin.register(SpecialCarTravel)
 class SpecialCarTravelAdmin(admin.ModelAdmin):
     save_on_top = True
+
+
+@admin.register(Chartered)
+class CharteredAdmin(admin.ModelAdmin):
+    save_on_top = True
+

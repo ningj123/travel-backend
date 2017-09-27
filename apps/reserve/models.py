@@ -130,3 +130,14 @@ class SpecialCarTravel(models.Model):
         verbose_name = "专车出行申请"
         verbose_name_plural = verbose_name
         ordering = ['-date_travel']
+
+
+class Chartered(models.Model):
+    phone = models.CharField(max_length=11, verbose_name="包车联系方式")
+
+    def __str__(self):
+        return self.phone
+
+    class Meta:
+        verbose_name = "包车"
+        verbose_name_plural = verbose_name

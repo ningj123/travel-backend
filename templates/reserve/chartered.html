@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block exttitle %}
+    包车
+{% endblock %}
+
+{% block exthead %}
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+
+        .bgimgwrapper {
+            top: 0;
+            position: absolute;
+            height: 300px;
+            width: 100%;
+            z-index: -1;
+        }
+
+        header {
+            margin-top: 15px;
+        }
+
+        .returnicon {
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 5px;
+            line-height: 39px;
+        }
+
+        .chartered {
+            background: #ffffff;
+            height: 450px;
+            border: 1px solid #8f8f8f;
+            border-radius: 15px;
+            margin: 100px 5% 5% 20px;
+        }
+
+        .inf {
+            margin-top: 150px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="bgimgwrapper" style="background-image: url({% static 'reserve/baoche.jpg' %})"></div>
+
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <i class="glyphicon glyphicon-chevron-left returnicon pull-left"
+                       onclick="location.href='{% url 'index' %}'"></i>
+                    <p class="h4" style="color: white; font-weight: 600">包车</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="chartered text-center">
+        <div class="inf">
+            <h2>包车请联系</h2>
+            <h2>{{ chartered.phone }}</h2>
+            <h2><i class="glyphicon glyphicon-earphone userphoneicon"
+                   onclick="location.href='tel://{{ chartered.phone }}'"></i></h2>
+        </div>
+    </section>
+{% endblock %}

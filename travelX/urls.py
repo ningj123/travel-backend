@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^reserve/seats/$', reserve_views.GetSeatsInfo.as_view(), name='seatsinfo'),
     url(r'^reserve/specialcar/$', reserve_views.SpecialCarTravel.as_view(), name='specialcartravel'),
     url(r'^reserve/specialcar/(?P<pk>[0-9]+)/$', reserve_views.SpecialCarMatch.as_view(), name='specailcarmatch'),
+    url(r'^chartered/$', reserve_views.CharteredReserve.as_view(), name='chartered'),
 
     url(r'^driver/$', driver_views.DriverIndexView.as_view(), name='driverindex'),
     url(r'^driver/schoolbusinfo/$', driver_views.SchoolBusInfoManage.as_view(), name='schoolbusinfo'),

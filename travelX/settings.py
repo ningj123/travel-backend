@@ -23,7 +23,8 @@ INSTALLED_APPS = [
     'reserve',
 
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -104,3 +105,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+CRONJOBS = [
+    ('0 1 * * *', 'reserve.views.auto_create_school_bus'),
+]

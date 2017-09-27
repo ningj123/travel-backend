@@ -14,6 +14,9 @@ class IndexView(TemplateView):
 
 
 class UcenterView(LoginRequiredMixin, TemplateView):
+    '''
+    用户个人中心模块
+    '''
     template_name = 'ucenter/ucenter.html'
 
     def get(self, request, *args, **kwargs):

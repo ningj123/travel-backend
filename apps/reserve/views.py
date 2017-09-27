@@ -31,6 +31,19 @@ class SchoolBusReserve(LoginRequiredMixin, TemplateView):
         # 依据时间重排序
         return sorted(times, key=lambda x: x.date_schedule)
 
+    @staticmethod
+    def generate_all_time_list():
+        '''
+        静态方法:依据星期创造一天中所有班次时间表
+        :return: 一天中所有班次时间表
+        '''
+        week = int(timezone.now().weekday() + 1)
+        ws = SchoolBusWeekSchedules.objects.get(week=week)
+        times = []
+        for t in ws.time.all():
+            times.append(t)
+        return sorted(times, key=lambda x: x.date_schedule)
+
     def get_context_data(self, **kwargs):
         if 'view' not in kwargs:
             kwargs['view'] = self
@@ -286,10 +299,13 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
         通过HTTP PUT方法处理接受匹配以及撤销
         '''
         last_travel = request.user.get_last_special_car_travel()
+        car = last_travel.car
         last_travel.is_accept = not last_travel.is_accept
         last_travel.save()
-        last_travel.car.status = True
-        last_travel.car.save()
+        for u in  last_travel.car.users.all():
+            if u.get_last_special_car_travel().is_accept == True:
+                car.status = False
+                car.save()
         return JsonResponse({
             'status': 1
         })

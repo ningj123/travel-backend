@@ -2,6 +2,8 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse, HttpResponseRedirect
+from django.urls.base import reverse
 
 from users.models import Driver
 from reserve.models import SchoolBus, SpecialCar
@@ -15,6 +17,8 @@ class DriverIndexView(LoginRequiredMixin, TemplateView):
     template_name = 'drivermanage/ucenter.html'
 
     def get(self, request, *args, **kwargs):
+        if request.user.usertype == 2:
+            return HttpResponseRedirect(reverse('ucenter'))
         context = self.get_context_data(**kwargs)
         # driver上下文：Driver对象
         context['driver'] = Driver.objects.get(user=request.user)
@@ -35,6 +39,7 @@ class SchoolBusInfoManage(LoginRequiredMixin, TemplateView):
         b = SchoolBus.objects.filter(schedule=ts)[0]
         # now上下文：默认显示的当前班次的信息，一个SchoolBus对象
         kwargs['now'] = b
+        kwargs['time_list'] = SchoolBusReserve.generate_all_time_list()
         return kwargs
 
 
@@ -56,5 +61,19 @@ class SpecialCarMatchInfoManage(LoginRequiredMixin, DetailView):
     model = SpecialCar
     context_object_name = 'carmatch'
 
-
-
+    def put(self, request, *args, **kwargs):
+        '''
+        通过HTTP PUT方法处理已完成操作
+        :return: 成功：{'status': 1}
+        '''
+        obj = self.get_object()
+        for u in obj.users.all():
+            u.get_last_special_car_travel().is_done = True
+            u.get_last_special_car_travel().save()
+            obj.users.remove(u)
+        obj.status = True
+        obj.num_user = 0
+        obj.save()
+        return JsonResponse({
+            'status': 1
+        })

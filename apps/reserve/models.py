@@ -5,6 +5,9 @@ from users.models import User, Driver
 
 
 class SchoolBusTimeSchedules(models.Model):
+    '''
+    出行时刻
+    '''
     date_schedule = models.CharField(max_length=10, verbose_name="时刻")
 
     def __str__(self):
@@ -16,6 +19,9 @@ class SchoolBusTimeSchedules(models.Model):
 
 
 class SchoolBusWeekSchedules(models.Model):
+    '''
+    校车一周中每天的出行时刻
+    '''
     week = models.IntegerField(
         choices=((1, "星期一"), (2, "星期二"), (3, "星期三"), (4, "星期四"), (5, "星期五"), (6, "星期六"), (7, "星期天")), verbose_name="星期")
     time = models.ManyToManyField(SchoolBusTimeSchedules, verbose_name="发车时间")
@@ -29,6 +35,11 @@ class SchoolBusWeekSchedules(models.Model):
 
 
 class SchoolBus(models.Model):
+    '''
+    校车类
+    通过定时任务会在每天凌晨依据SchoolBusWeekSchedules来创建这天的所有SchoolBus对象
+    一个SchoolBus代表一个班次，其存放了本班次的所有信息
+    '''
     schedule = models.ForeignKey(SchoolBusTimeSchedules, verbose_name="时刻")
     num_reserve = models.IntegerField(default=0, verbose_name="预约人数")
     num_seats = models.IntegerField(blank=True, null=True, default=47, verbose_name="总座位数")
@@ -44,6 +55,10 @@ class SchoolBus(models.Model):
 
 
 class SchoolBusReserve(models.Model):
+    '''
+    校车预约类
+    当用户发起乘坐校车申请时会创建
+    '''
     user = models.ForeignKey(User, verbose_name="用户")
     schoolbus = models.ForeignKey(SchoolBus, verbose_name="校车班次")
     date_reserve = models.DateTimeField(default=timezone.now, verbose_name="发起预约时间")
@@ -65,6 +80,10 @@ class SchoolBusReserve(models.Model):
 
 
 class SpecialCar(models.Model):
+    '''
+    专车类
+    用于完成专车匹配/预约相关功能
+    '''
     driver = models.OneToOneField(Driver, verbose_name="专车司机")
     num_user = models.IntegerField(default=0, verbose_name="搭乘人数")
     status = models.BooleanField(default=False, verbose_name="状态", help_text="False不能匹配，True可匹配")
@@ -74,7 +93,7 @@ class SpecialCar(models.Model):
         return self.driver.user.username
 
     def  get_all_users_in_car(self):
-        return self.users.order_by('-specialcartravel')
+        return self.users.all().order_by('-specialcartravel')
 
     class Meta:
         verbose_name = "专车"
@@ -82,7 +101,12 @@ class SpecialCar(models.Model):
 
 
 class SpecialCarTravel(models.Model):
+    '''
+    专车匹配类
+    当用户发起一个专车出行匹配（匹配到车辆）会被创建
+    '''
     PLACE_CHOICE = ((1, "大花岭"), (2, "街道口"), (3, "光谷"), (4, "武昌站"), (5, "汉口火车站"), (6, "武汉站"))
+
     user = models.ForeignKey(User, verbose_name="用户")
     car = models.ForeignKey(SpecialCar, verbose_name="专车")
     place = models.IntegerField(choices=PLACE_CHOICE,verbose_name="目的地")

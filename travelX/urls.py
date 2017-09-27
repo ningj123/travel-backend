@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^driver/$', driver_views.DriverIndexView.as_view(), name='driverindex'),
     url(r'^driver/schoolbusinfo/$', driver_views.SchoolBusInfoManage.as_view(), name='schoolbusinfo'),
     url(r'^driver/specialcarinfo/$', driver_views.SpecialCarInfoManage.as_view(), name='specialcarinfo'),
+    url(r'^driver/specialcarinfo/(?P<pk>[0-9]+)/$', driver_views.SpecialCarMatchInfoManage.as_view(), name='specialcarmatchinfo'),
 
     url(r'^about/$', TemplateView.as_view(template_name='other/about.html'), name='about'),
     url(r'^agreement/$', TemplateView.as_view(template_name='other/agreement.html'), name='agreement'),

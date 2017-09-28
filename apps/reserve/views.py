@@ -2,9 +2,12 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
-from django.http import HttpResponseNotFound, JsonResponse, Http404
+from django.http import HttpResponseNotFound, JsonResponse, Http404, HttpResponseRedirect
+from django.urls.base import reverse
+from django.db.models import Q
 
-from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar, Chartered
+from .models import SchoolBusWeekSchedules, SchoolBusTimeSchedules, SchoolBus, SpecialCar, Chartered, \
+    SpecialCarTimeSchedule
 from .models import SpecialCarTravel as Travel
 from .models import SchoolBusReserve as Reserve
 from users.models import UcenterReserveWrapper
@@ -202,6 +205,17 @@ class SpecialCarTravel(LoginRequiredMixin, TemplateView):
         kwargs['carnum'] = SpecialCar.objects.filter(status=True).__len__()
         # place_list上下文：目的地列表
         kwargs['place_list'] = Travel.get_all_place()
+        times = []
+        for t in SpecialCarTimeSchedule.objects.filter(Q(starttime__hour__gt=timezone.now().time().hour)):
+            if timezone.now().time().minute < 30:
+                if t == SpecialCarTimeSchedule.objects.get(starttime__hour=timezone.now().hour + 1, starttime__minute=0):
+                    continue
+            else:
+                if t == SpecialCarTimeSchedule.objects.get(starttime__hour=timezone.now().hour + 1, starttime__minute=30):
+                    times.remove(SpecialCarTimeSchedule.objects.get(starttime__hour=timezone.now().hour + 1, starttime__minute=0))
+                    continue
+            times.append(t)
+        kwargs['times'] = times
         return kwargs
 
     def get(self, request, *args, **kwargs):
@@ -275,7 +289,10 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.check_object(request, self.object)
+        try:
+            self.check_object(request, self.object)
+        except:
+            return HttpResponseRedirect(reverse('specialcartravel'))
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -302,7 +319,7 @@ class SpecialCarMatch(LoginRequiredMixin, DetailView):
         car = last_travel.car
         last_travel.is_accept = not last_travel.is_accept
         last_travel.save()
-        for u in  last_travel.car.users.all():
+        for u in last_travel.car.users.all():
             if u.get_last_special_car_travel().is_accept == True:
                 car.status = False
                 car.save()
@@ -360,8 +377,10 @@ def auto_wrapper_delete_for_travel(sender, **kwargs):
     UcenterReserveWrapper.objects.get(reserve_pk=pk, reserve_type=2).delete()
 
 
-
 class CharteredReserve(TemplateView):
+    '''
+    包车模块
+    '''
     template_name = 'reserve/chartered.html'
 
     def get_context_data(self, **kwargs):
@@ -371,10 +390,10 @@ class CharteredReserve(TemplateView):
         return kwargs
 
 
-
-# TODO: Add Crontab JOB
-
 def auto_create_school_bus():
+    '''
+    自动创建当天的所有校车班次
+    '''
     week = int(timezone.now().weekday() + 1)
     ws = SchoolBusWeekSchedules.objects.get(week=week)
     for ts in ws.time.all():

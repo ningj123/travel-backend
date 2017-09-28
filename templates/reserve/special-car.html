@@ -32,12 +32,30 @@
                 <p class="h4" style="line-height: 30px">当前可用专车数：<span class="canum">{{ carnum }}</span>&nbsp;辆</p>
             </div>
             <div class="row order">
-                <label for="choicePlace" id="choiceLabel"><i class="glyphicon glyphicon-send"
-                                                             style="color: #ffb81a"></i>&nbsp;&nbsp;选择目的地</label>
-                <select class="form-control order-choice" id="choicePlace" onchange="choice()">
+                <label for="choicePlace" class="choiceLabel" id="label1"><i class="glyphicon glyphicon-send"
+                                                                            style="color: #ffb81a"></i>&nbsp;&nbsp;选择目的地</label>
+                <select class="form-control order-choice" id="choicePlace" onchange="choice('label1')">
                     <option hidden></option>
                     {% for place in place_list %}
                         <option value="{{ forloop.counter }}">{{ place }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="choiceUserNum" class="choiceLabel" id="label2"><i class="glyphicon glyphicon-user"
+                                                                              style="color: deepskyblue"></i>&nbsp;&nbsp;选择出行人数</label>
+                <select class="form-control order-choice" id="choiceUserNum" onchange="choice('label2')">
+                    <option hidden></option>
+                    <option value="1">单人</option>
+                    <option value="4">四人</option>
+                </select>
+                <br>
+                <label for="choiceTime" class="choiceLabel" id="label3"><i class="glyphicon glyphicon-time"
+                                                                           style="color: #00ff09"></i>&nbsp;&nbsp;选择出发时间</label>
+                <select class="form-control order-choice" id="choiceTime" onchange="choice('label3')">
+                    <option hidden></option>
+                    <option value="0">即刻</option>
+                    {% for t in times %}
+                        <option value="{{ t.pk }}">{{ t.starttime }} -- {{ t.endtime }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -58,8 +76,9 @@
     </section>
 
     <script>
-        function choice() {
-            $('#choiceLabel')[0].innerHTML = '';
+        function choice(tagName) {
+            console.log(tagName);
+            $('#' + tagName)[0].innerHTML = '';
         }
 
         function onSubmit() {

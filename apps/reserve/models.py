@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 
@@ -97,6 +99,18 @@ class SpecialCar(models.Model):
 
     class Meta:
         verbose_name = "专车"
+        verbose_name_plural = verbose_name
+
+
+class SpecialCarTimeSchedule(models.Model):
+    '''
+    专车预约时间段
+    '''
+    starttime = models.TimeField(verbose_name="起始时间")
+    endtime = models.TimeField(blank=True, verbose_name='结束时间')
+
+    class Meta:
+        verbose_name = '专车预约时间段'
         verbose_name_plural = verbose_name
 
 

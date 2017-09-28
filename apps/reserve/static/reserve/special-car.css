@@ -39,7 +39,7 @@ header {
 }
 
 .order {
-    margin: 90px 5px 20px 5px;
+    margin: 40px 5px 20px 5px;
     font-size: 18px;
     padding-bottom: 5px;
 }
@@ -51,7 +51,7 @@ header {
     box-shadow: none;
 }
 
-#choiceLabel {
+.choiceLabel {
     position: absolute;
     font-weight: 500;
 }

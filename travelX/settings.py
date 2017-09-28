@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'utils'))
 
 SECRET_KEY = ')u08=^3u5iw*%2b$v1tgfi(-)l=hvl7$$o7uwy7m_h#cjcc@#k'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 

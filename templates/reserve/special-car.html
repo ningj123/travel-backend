@@ -41,14 +41,6 @@
                     {% endfor %}
                 </select>
                 <br>
-                <label for="choiceUserNum" class="choiceLabel" id="label2"><i class="glyphicon glyphicon-user"
-                                                                              style="color: deepskyblue"></i>&nbsp;&nbsp;选择出行人数</label>
-                <select class="form-control order-choice" id="choiceUserNum" onchange="choice('label2')">
-                    <option hidden></option>
-                    <option value="1">单人</option>
-                    <option value="4">四人</option>
-                </select>
-                <br>
                 <label for="choiceTime" class="choiceLabel" id="label3"><i class="glyphicon glyphicon-time"
                                                                            style="color: #00ff09"></i>&nbsp;&nbsp;选择出发时间</label>
                 <select class="form-control order-choice" id="choiceTime" onchange="choice('label3')">
@@ -57,6 +49,14 @@
                     {% for t in times %}
                         <option value="{{ t.pk }}">{{ t.starttime }} -- {{ t.endtime }}</option>
                     {% endfor %}
+                </select>
+                <br>
+                <label for="choiceUserNum" class="choiceLabel" id="label2"><i class="glyphicon glyphicon-question-sign"
+                                                                              style="color: deepskyblue"></i>&nbsp;&nbsp;是否拼车</label>
+                <select class="form-control order-choice" id="choiceUserNum" onchange="choice('label2')">
+                    <option hidden></option>
+                    <option value="0">否</option>
+                    <option value="1">是</option>
                 </select>
             </div>
             {% if nowpk %}
